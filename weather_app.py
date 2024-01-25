@@ -1,20 +1,18 @@
-import pandas as pd
-import plotly.express as px
+
 import dash
 from dash import Dash, html,dcc
 import plotly.express as px
 import pandas as pd
 import plotly.express as px
 
-import pandas as pd 
-import dash
+
 from dash import Dash, dcc, html, callback
 from dash.dependencies import Input, Output, State
 import plotly.express as px
 from dash import dash_table
 import dash_bootstrap_components as dbc
-from dash import dash_table
-import dash_bootstrap_components as dbc
+
+
 
 df= pd.read_csv('climate.csv')
 df_2 =pd.read_csv('iso_codes.csv')
