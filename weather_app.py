@@ -31,89 +31,119 @@ df_countries = merged_df_country[merged_df_country['country'].isin(['Egypt', 'Mo
 
 app =dash.Dash(external_stylesheets=[dbc.themes.QUARTZ])
 server = app.server
-d_table = dash_table.DataTable(df_countries.to_dict('records'),
-                                  [{"name": i, "id": i} for i in df_egypt.columns],
-                               style_data={'color': 'white','backgroundColor': 'black'},
-                              style_header={
-                                  'backgroundColor': 'rgb(210, 210, 210)',
-                                  'color': 'black','fontWeight': 'bold'
-    })
-fig = px.bar(df_countries, 
-             x='month', 
-             y='avg_temp_country',  
-             color='country',
-             barmode='group',
-             height=300, title = "Egypt",)
-
-fig = fig.update_layout(
-        plot_bgcolor="#222222", paper_bgcolor="#222222", font_color="white"
-    )
-
-graph = dcc.Graph(figure=fig)
-
-fig2 = px.line(df_egypt, x='month', y='avg_temp_country', height=300, title="Average temperature in Egypt", markers=True)
-fig2 = fig2.update_layout(
-        plot_bgcolor="#222222", paper_bgcolor="#222222", font_color="white"
-    )
-graph2 = dcc.Graph(figure=fig2)
-
-fig3 = px.choropleth(df_countries, locations='alpha-3', 
-                    projection='natural earth', animation_frame="month",
-                    scope='africa',   #we are adding the scope as europe
-                    color='avg_temp_country', locationmode='ISO-3', 
-                    color_continuous_scale=px.colors.sequential.ice)
-
-fig3 = fig3.update_layout(
-        plot_bgcolor="#222222", paper_bgcolor="#222222", font_color="white", geo_bgcolor="#222222"
-    )
-
-
-graph3 = dcc.Graph(figure=fig3)
-
-fig4= px.scatter_mapbox(df_countries, 
-                        lat="lat", lon="lon", 
-                        hover_name="country", 
-                        # start location and zoom level
-                        zoom=4, 
-                        mapbox_style='carto-positron')
-fig4.update_layout(width=1000, height=600,
-coloraxis_colorbar=dict(title='Average Temperature (°C)'),
-coloraxis=dict(cmin=df_countries['avg_temp'].min(), cmax=df_countries['avg_temp'].max()),
+d_table = dash_table.DataTable(
+    id='table',
+    columns=[{"name": i, "id": i} for i in merged_df_country.columns],
+    data=merged_df_country.to_dict('records'),
+    style_data={'color': 'white', 'backgroundColor': 'black'},
+    style_header={'backgroundColor': 'rgb(210, 210, 210)', 'color': 'black', 'fontWeight': 'bold'}
 )
-fig4 = fig4.update_layout(
-        plot_bgcolor="#222222", paper_bgcolor="#222222", font_color="white", geo_bgcolor="#222222"
-    )
-graph4 = dcc.Graph(figure=fig4)
-
-
-app.layout = html.Div([html.H1('Weather', style={'textAlign': 'center', 'color': 'coral'}), 
-                       html.H2('Welcome', style ={'paddingLeft': '30px'}),
-                       html.H3('These are the Graphs'),
-                       html.Div([html.Div('Egypt', style={'backgroundColor': 'coral', 'color': 'white', 'width': "Germany"}),d_table, graph, graph2, graph3, graph4])
-])
-
-color_continuous_scale=px.colors.sequential.Plasma
-fig5 = px.choropleth(
-    data_frame= df_countries,
+# Create figures for demonstration
+color_continuous_scale = px.colors.sequential.Plasma
+fig_1 = px.choropleth(
+    data_frame=df_countries,
     locations="alpha-3",
-    color="avg_temp",
-    hover_name="alpha-3",
+    color="avg_temp_country",
+    locationmode='ISO-3',
+    color_continuous_scale=px.colors.sequential.Jet,
+    hover_name="country",
     animation_frame="month",
     projection='natural earth',
-    title='Temperature Over Time'
+    title='Yearly Average Temperature Variations in Major Cities'
 )
-fig5.update_layout(width=1000, height=600,
-coloraxis_colorbar=dict(title='Average Temperature (°C)'),
-coloraxis=dict(cmin=merged_df_country['avg_temp'].min(), cmax=merged_df_country['avg_temp'].max()),
+fig_1 = fig_1.update_layout(
+    plot_bgcolor="#222222", paper_bgcolor="#222222", geo_bgcolor="#222222", font_color="White", width=1050, height=600,
+    coloraxis_colorbar=dict(title='Average Temperature (°C)'),
+    coloraxis=dict(cmin=merged_df_country['avg_temp_country'].min(), cmax=merged_df_country['avg_temp_country'].max()),
 )
-fig5.write_html('temperature1.html', include_plotlyjs='cdn')
-graph5 = dcc.Graph(figure=fig5)
-
-fig5 = fig5.update_layout(
-        plot_bgcolor="#222222", paper_bgcolor="#222222", font_color="white", geo_bgcolor="#222222"
+graph1 = dcc.Graph(id='graph1', figure=fig_1, style={'border': '3px solid #636EFA'})
+fig_2 = px.line(
+    merged_df_country, x='month', y='avg_temp_country', height=300,
+    title='Monthly average temperature overview', markers=True
+)
+fig_2 = fig_2.update_layout(plot_bgcolor="#222222", paper_bgcolor="#222222", font_color="White")
+graph2 = dcc.Graph(id='graph2', figure=fig_2, style={'backgroundColor': 'black', 'border': '3px solid #636EFA'})
+app = dash.Dash(external_stylesheets=[dbc.themes.CYBORG])
+# Create dropdown options from unique cities in the DataFrame
+dropdown_options_countries = [{'label': country, 'value': country} for country in merged_df_country['country'].unique()]
+app.layout = html.Div([
+    html.H1('Yearly Weather Patterns in Major Cities', style={'textAlign': 'center', 'color': '#636EFA'}),
+    html.Div(html.P("Overview of Weather fluctuations using Weather API Data"),
+             style={'marginLeft': 50, 'marginRight': 25}),
+    html.Div([
+        dcc.Dropdown(
+            id='country-dropdown',
+            options=dropdown_options_countries,
+            value=dropdown_options_countries[0]['value'],
+            multi=False,
+            style={'width': '50%', 'marginLeft': 'auto', 'marginRight': 'auto'}
+        ),
+        html.Div(id='selected-country-info'),
+        d_table,
+        graph1,
+        graph2
+    ])
+])
+# Define callback functions to update the table and graphs based on dropdown selection
+@app.callback(
+    Output('selected-country-info', 'children'),
+    Output('table', 'data'),
+    Output('table', 'columns'),
+    Output('graph1', 'figure'),
+    Output('graph2', 'figure'),
+    Input('dropdown_options_countries', 'value')
+)
+def update_data(selected_country):
+    # Filter the DataFrame based on the selected city
+    filtered_data = merged_df_country[merged_df_country['country'] == selected_country]
+    # Display selected city information
+    info_text = f'Selected Country: {selected_country}'
+    # Display filtered table
+    table_data = filtered_data.to_dict('records')
+    table_columns = [{"name": i, "id": i} for i in filtered_data.columns]
+    # Display filtered graphs
+    fig_1 = px.choropleth(
+        data_frame=filtered_data,
+        locations="alpha-3",
+        color="avg_temp_country",
+        locationmode='ISO-3',
+        color_continuous_scale=px.colors.sequential.Jet,
+        hover_name="country",
+        animation_frame="month",
+        projection='natural earth',
+        title=f'Yearly Average Temperature Variations in {selected_city}'
     )
-
-
-
+    fig_1 = fig_1.update_layout(
+        plot_bgcolor="#222222", paper_bgcolor="#222222", geo_bgcolor="#222222", font_color="White", width=1050, height=600,
+        coloraxis_colorbar=dict(title='Average Temperature (°C)'),
+        coloraxis=dict(cmin=filtered_data['avg_temp_country'].min(), cmax=filtered_data['avg_temp_country'].max()),
+    )
+    graph1 = dcc.Graph(id='graph1', figure=fig_1, style={'border': '3px solid #636EFA'})
+    fig_2 = px.line(
+        filtered_data, x='month', y='avg_temp_country', height=300,
+        title=f'{selected_city} monthly average temperature overview', markers=True
+    )
+    fig_2 = fig_2.update_layout(plot_bgcolor="#222222", paper_bgcolor="#222222", font_color="White")
+    graph2 = dcc.Graph(id='graph2', figure=fig_2, style={'backgroundColor': 'black', 'border': '3px solid #636EFA'})
+    return info_text, table_data, table_columns, fig_1, fig_2
 if __name__ == '__main__':
-     app.run_server(port= 8089)
+    app.run_server(port=8097)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
