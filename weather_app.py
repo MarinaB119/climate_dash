@@ -16,8 +16,8 @@ import dash_bootstrap_components as dbc
 from dash import dash_table
 import dash_bootstrap_components as dbc
 
-df= pd.read_csv('../data/climate.csv')
-df_2 =pd.read_csv('../data/iso_codes.csv')
+df= pd.read_csv('climate.csv')
+df_2 =pd.read_csv('iso_codes.csv')
 merged_df = df.merge( df_2, on= 'country', how = 'left')
 merged_df['date'] = pd.to_datetime(merged_df['date'])
 
