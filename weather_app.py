@@ -41,7 +41,7 @@ df_countries = df_countries[['country','alpha-3','month', 'avg_temp_country', 'a
 df_countries_monthly = df_countries.groupby(['country', 'month']).agg({
     'avg_temp_country': 'mean', 'avg_temp_country': 'max','avg_min_temp':'min'
 }).reset_index()
-app =dash.Dash(external_stylesheets=[dbc.themes.Slate])
+app =dash.Dash(external_stylesheets=[dbc.themes.VAPOR])
 server = app.server
 graph = dcc.Graph()
 countries =df_countries['country'].unique().tolist() 
