@@ -113,7 +113,7 @@ def update_bar_chart(countries):
     fig = fig.update_layout(
         plot_bgcolor="#222222", paper_bgcolor="#222222", font_color="white"
     )
-    fig2 = px.line(df_countries[mask], x='month', y='avg_temp_country', color='country', height=300, title="Average Temperature in Morocco, Egypt, Italy  & Germany", markers=True)
+    fig2 = px.line(df_countries[mask], x='month', y='avg_temp_country', color='country', height=300, title="Average Temperature in Morocco, Egypt, Italy & Germany", markers=True)
 
 
     fig2.update_layout(
