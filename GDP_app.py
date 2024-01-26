@@ -81,11 +81,11 @@ def update_bar_chart(countries):
              y='gdpPercap',  
              color='country',
              barmode='group',
-             height=300, title = "'Japan', 'Brazil', 'China' & 'India'",)
+             height=300, title = "Japan, Brazil, China & India",)
     fig = fig.update_layout(
         plot_bgcolor="#222222", paper_bgcolor="#222222", font_color="white"
     )
-    fig2 = px.line(df_countries[mask], x='year', y='gdpPercap', color='country', height=300, title="GDP per capita in 'Japan', 'Brazil' %'India'", markers=True)
+    fig2 = px.line(df_countries[mask], x='year', y='gdpPercap', color='country', height=300, title="GDP per capita in Japan, Brazil, China & India", markers=True)
 
 
     fig2.update_layout(
