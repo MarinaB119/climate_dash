@@ -69,7 +69,7 @@ fig = fig.update_layout(
 
 graph = dcc.Graph(figure=fig)
 
-fig2 = px.line(df_countries, x='month', y='avg_temp_country',color= 'country', height=300, title="Average temperature in Egypt", markers=True)
+fig2 = px.line(df_countries, x='month', y='avg_temp_country',color= 'country', height=300, title="Average temperature in countries", markers=True)
 fig2 = fig2.update_layout(
         plot_bgcolor="#222222", paper_bgcolor="#222222", font_color="white"
     )
@@ -113,7 +113,7 @@ def update_bar_chart(countries):
     fig = fig.update_layout(
         plot_bgcolor="#222222", paper_bgcolor="#222222", font_color="white"
     )
-    fig2 = px.line(df_countries[mask], x='month', y='avg_temp_country', color='country', height=300, title="Average Temperature in Morocco, Egypt  & Algeria", markers=True)
+    fig2 = px.line(df_countries[mask], x='month', y='avg_temp_country', color='country', height=300, title="Average Temperature in Morocco, Egypt, Italy  & Germany", markers=True)
 
 
     fig2.update_layout(
