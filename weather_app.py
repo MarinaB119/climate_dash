@@ -36,7 +36,7 @@ d_table = dash_table.DataTable(df_egypt.to_dict('records'),
                                   'backgroundColor': 'rgb(210, 210, 210)',
                                   'color': 'black','fontWeight': 'bold'
     })
-df_countries = merged_df_country[merged_df_country['country'].isin(['Egypt', 'Morocco', 'Algeria', 'Italy'])]
+df_countries = merged_df_country[merged_df_country['country'].isin(['Egypt', 'Morocco', 'Italy', 'Germany'])]
 df_countries = df_countries[['country','alpha-3','month', 'avg_temp_country', 'avg_max_temp', 'avg_min_temp', 'lat', 'lon']]
 df_countries_monthly = df_countries.groupby(['country', 'month']).agg({
     'avg_temp_country': 'mean', 'avg_temp_country': 'max','avg_min_temp':'min'
@@ -46,7 +46,7 @@ server = app.server
 graph = dcc.Graph()
 countries =df_countries['country'].unique().tolist() 
 
-dropdown = dcc.Dropdown(['Morocco', 'Egypt', 'Algeria', 'Italy'], value=['Morocco', 'Egypt', 'Algeria','Italy'], 
+dropdown = dcc.Dropdown(['Morocco', 'Egypt', 'Germany', 'Italy'], value=['Morocco', 'Egypt', 'Germany','Italy'], 
                         clearable=False, multi=True, style ={'paddingLeft': '30px', 
                                                              "backgroundColor": "#222222", "color": "#222222"})
 d_table = dash_table.DataTable(df_countries_monthly.to_dict('records'),
@@ -61,7 +61,7 @@ fig = px.bar(df_countries,
              y='avg_temp_country',  
              color='country',
              barmode='group',
-             height=300, title = "Egypt",)
+             height=300, title = "countries",)
 
 fig = fig.update_layout(
         plot_bgcolor="#222222", paper_bgcolor="#222222", font_color="white"
@@ -109,7 +109,7 @@ def update_bar_chart(countries):
              y='avg_temp_country',  
              color='country',
              barmode='group',
-             height=300, title = "Morocco vs Egypt & Algeria",)
+             height=300, title = "Morocco, Egypt, Italy & Germany",)
     fig = fig.update_layout(
         plot_bgcolor="#222222", paper_bgcolor="#222222", font_color="white"
     )
@@ -126,7 +126,7 @@ def update_bar_chart(countries):
 
     fig3 = px.choropleth(df_countries[mask], locations='alpha-3', 
                     projection='natural earth', animation_frame="month",
-                    scope='africa',
+                    scope='world',
                     color='avg_temp_country', locationmode='ISO-3', 
                     color_continuous_scale=px.colors.sequential.Plasma)
 
